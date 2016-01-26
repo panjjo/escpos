@@ -77,9 +77,23 @@ func New() (e *Escpos) {
 	return
 }
 
+func (e *Escpos) PrintSplitLine(n int) {
+	s := "-"
+	for i := 0; i < n; i++ {
+		s += "-"
+	}
+	e.Write(s)
+	e.Linefeed(1)
+}
+
 func (e *Escpos) Barcode(s string) {
 	e.Write(fmt.Sprintf("\x1Dk%c%s%c", 4, s, 0))
 	// e.Write(fmt.Sprintf("\x1Dk%c12345678910%c", 1, 0))
+}
+
+//set right space
+func (e *Escpos) SendRightSpace(n int) {
+	e.Write(fmt.Sprintf("\x1BSP%c", n))
 }
 
 //print and feed paper
