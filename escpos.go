@@ -52,8 +52,8 @@ type Escpos struct {
 
 	// state toggles GS[char]
 	reverse, smooth uint8
-
-	b []byte
+	s               string
+	b               []byte
 }
 
 // reset toggles
@@ -126,12 +126,18 @@ func (e *Escpos) WriteRaw(data []byte) (n int, err error) {
 
 // write a string to the b
 func (e *Escpos) Write(data string) (int, error) {
+	e.s += data
 	return e.WriteRaw([]byte(data))
 }
 
 //read data by buffer
 func (e *Escpos) Readbyte() (int, []byte) {
 	return len(e.b), e.b
+}
+
+//read data by buffer
+func (e *Escpos) ReadString() string {
+	return e.s
 }
 
 //send b to printer
@@ -174,18 +180,16 @@ func (e *Escpos) Formfeed() {
 
 // set font
 func (e *Escpos) SetFont(font string) {
-	f := 0
+	f := 48
 
 	switch font {
 	case "A":
-		f = 0
+		f = 48
 	case "B":
-		f = 1
-	case "C":
-		f = 2
+		f = 49
 	default:
 		log.Fatal(fmt.Sprintf("Invalid font: '%s', defaulting to 'A'", font))
-		f = 0
+		f = 48
 	}
 
 	e.Write(fmt.Sprintf("\x1BM%c", f))
@@ -290,14 +294,14 @@ func (e *Escpos) Pulse() {
 
 // set alignment
 func (e *Escpos) SetAlign(align string) {
-	a := 0
+	a := 48
 	switch align {
 	case "left":
-		a = 0
+		a = 48
 	case "center":
-		a = 1
+		a = 49
 	case "right":
-		a = 2
+		a = 50
 	default:
 		log.Fatal(fmt.Sprintf("Invalid alignment: %s", align))
 	}
