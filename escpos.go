@@ -77,6 +77,13 @@ func New() (e *Escpos) {
 	return
 }
 
+//set location l+n*255
+func (e *Escpos) SetLocation(l, n int) {
+	e.Write(fmt.Sprintf("\x1B$"))
+	e.b = append(e.b, byte(l))
+	e.b = append(e.b, byte(n))
+}
+
 func (e *Escpos) PrintSplitLine(n int) {
 	s := "-"
 	for i := 0; i < n; i++ {
@@ -88,6 +95,7 @@ func (e *Escpos) PrintSplitLine(n int) {
 
 func (e *Escpos) Barcode(s string) {
 	e.Write(fmt.Sprintf("\x1Dk%c%s%c", 4, s, 0))
+	// e.Write(fmt.Sprintf("\x1Dk%c%c%s", 4, len(s), s))
 	// e.Write(fmt.Sprintf("\x1Dk%c12345678910%c", 1, 0))
 }
 
@@ -117,6 +125,25 @@ func (e *Escpos) BarcodeHRIFontSize(n int) {
 func (e *Escpos) BarcodeHigth(n int) {
 	e.Write(fmt.Sprintf("\x1Dh%c", n))
 }
+
+// '// Print
+// barcode >>>
+// '// Select justification: Centering
+// ESC "a" 1
+// "<< Bonus points : 14 >>"
+// '// Print and feed paper: Paper feeding amount = 4.94 mm (35/180 inches)
+// ESC "J" 35
+// '// Set barcode height: in case TMT20,
+// 6.25 mm (50/203 inches)
+// GS "h" 50
+// '// Select print position of HRI characters: Print position, below the barcode
+// GS "H" 2
+// '// Select font for HRI characters: Font B
+// GS "f" 1
+// '// Print barcode: (A) format, barcode system = CODE39
+// GS "k" 4 "*00014*" 0
+// '// Print
+// barcode <<<
 
 // write raw bytes to b
 func (e *Escpos) WriteRaw(data []byte) (n int, err error) {
@@ -180,16 +207,16 @@ func (e *Escpos) Formfeed() {
 
 // set font
 func (e *Escpos) SetFont(font string) {
-	f := 48
+	f := 0
 
 	switch font {
 	case "A":
-		f = 48
+		f = 0
 	case "B":
-		f = 49
+		f = 1
 	default:
 		log.Fatal(fmt.Sprintf("Invalid font: '%s', defaulting to 'A'", font))
-		f = 48
+		f = 0
 	}
 
 	e.Write(fmt.Sprintf("\x1BM%c", f))
@@ -294,14 +321,14 @@ func (e *Escpos) Pulse() {
 
 // set alignment
 func (e *Escpos) SetAlign(align string) {
-	a := 48
+	a := 0
 	switch align {
 	case "left":
-		a = 48
+		a = 0
 	case "center":
-		a = 49
+		a = 1
 	case "right":
-		a = 50
+		a = 2
 	default:
 		log.Fatal(fmt.Sprintf("Invalid alignment: %s", align))
 	}
