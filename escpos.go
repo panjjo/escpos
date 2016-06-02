@@ -77,9 +77,34 @@ func New() (e *Escpos) {
 	return
 }
 
+//水平定位
+func (e *Escpos)MoveBaseSize(){
+	e.Write(fmt.Sprint("\x09"))
+}
+
+//设置横向和纵向移动单位
+func (e *Escpos) SetMoveSize(x, y int) {
+	e.Write(fmt.Sprintf("\x1D%c%c%c", 80, x, y))
+	e.b = append(e.b, byte(x))
+	e.b = append(e.b, byte(y))
+}
+
+//设置打印模式
+func (e *Escpos) SetPrinterType(n int) {
+	e.Write(fmt.Sprintf("\x1B!%c", n))
+}
+
 //set location l+n*255
+//设置绝对打印位置
 func (e *Escpos) SetLocation(l, n int) {
 	e.Write(fmt.Sprintf("\x1B$"))
+	e.b = append(e.b, byte(l))
+	e.b = append(e.b, byte(n))
+}
+
+//设置相对打印位置
+func (e *Escpos) SetReLocation(l, n int) {
+	e.Write(fmt.Sprintf("\x1B\\$"))
 	e.b = append(e.b, byte(l))
 	e.b = append(e.b, byte(n))
 }
@@ -101,7 +126,7 @@ func (e *Escpos) Barcode(s string) {
 
 //set right space
 func (e *Escpos) SendRightSpace(n int) {
-	e.Write(fmt.Sprintf("\x1BSP%c", n))
+	e.Write(fmt.Sprintf("\x1B%c%c", 32, n))
 }
 
 //print and feed paper
@@ -176,6 +201,9 @@ func (e *Escpos) SendTo(w io.Writer) (int, error) {
 func (e *Escpos) Init() {
 	e.reset()
 	e.Write("\x1B@")
+	e.SendEmphasize()
+	e.SetPrinterType(0)
+	e.SendRotate()
 }
 
 // end output
