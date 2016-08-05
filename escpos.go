@@ -77,8 +77,23 @@ func New() (e *Escpos) {
 	return
 }
 
+func (e *Escpos) SetPrintPic() {
+	e.Write(fmt.Sprintf("\x1D*%c%c%v", 2, 2, "11111000001010101111100000101010"))
+}
+
+//打印下载位图
+func (e *Escpos) PrintPic() {
+	e.Write(fmt.Sprintf("\x1D/%c", 0))
+}
+
+//开钱箱
+func (e *Escpos) OpenCashBox() {
+	e.Write(fmt.Sprintf("\x1Bp%c%c%c", 0, 2, 4))
+	e.Write(fmt.Sprintf("\x10\x14%c%c%c", 1, 0, 1))
+}
+
 //水平定位
-func (e *Escpos)MoveBaseSize(){
+func (e *Escpos) MoveBaseSize() {
 	e.Write(fmt.Sprint("\x09"))
 }
 
@@ -92,6 +107,11 @@ func (e *Escpos) SetMoveSize(x, y int) {
 //设置打印模式
 func (e *Escpos) SetPrinterType(n int) {
 	e.Write(fmt.Sprintf("\x1B!%c", n))
+}
+
+//设置行间距
+func (e *Escpos) SetLineSpacing(n int) {
+	e.Write(fmt.Sprintf("\x1B3%c", n))
 }
 
 //set location l+n*255
