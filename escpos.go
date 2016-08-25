@@ -129,12 +129,12 @@ func (e *Escpos) SetReLocation(l, n int) {
 	e.b = append(e.b, byte(n))
 }
 
-func (e *Escpos) PrintSplitLine(n int) {
-	s := "-"
+func (e *Escpos) PrintSplitLine(n int, s string) {
+	t := s
 	for i := 0; i < n; i++ {
-		s += "-"
+		t += s
 	}
-	e.Write(s)
+	e.Write(t)
 	e.Linefeed(1)
 }
 
@@ -238,14 +238,15 @@ func (e *Escpos) Cut() {
 
 // send linefeed
 func (e *Escpos) Linefeed(n int) {
-	for i := 0; i < n; i++ {
-		e.Write("\n")
-	}
+	e.FormfeedN(n)
+	//for i := 0; i < n; i++ {
+	//e.Write("\n")
+	//}
 }
 
 // send N formfeeds
 func (e *Escpos) FormfeedN(n int) {
-	e.Write(fmt.Sprintf("\x1Bd%c", 1))
+	e.Write(fmt.Sprintf("\x1Bd%c", n))
 }
 
 // send formfeed
