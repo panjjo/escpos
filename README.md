@@ -36,14 +36,14 @@ import (
 )
 
 func main() {
-    f, err := os.Open("/dev/usb/lp3")
+    f, err := os.OpenFile("/dev/usb/lp3",os.O_RDWR,0755)
     if err != nil {
         panic(err)
     }
     defer f.Close()
 
-    w := bufio.NewWriter(f)
-    p := escpos.New(w)
+
+    p := escpos.New()
 
     p.Init()
     p.SetSmooth(1)
@@ -79,7 +79,8 @@ func main() {
 
     p.Cut()
     p.End()
-
-    w.Flush()
+     
+    _,b:=p.ReadByte()
+    f.Write(b)
 }
 ```
