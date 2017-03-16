@@ -658,9 +658,9 @@ func (e *Escpos) WriteNode(name string, params map[string]string, data string) {
 	}
 }
 
-//print Qrcode
+//print img 可用做打印二维码
 //使用33（24点双密度)
-func (e *Escpos) QrCode(img image.Image) {
+func (e *Escpos) PrinterImage(img image.Image) {
 	e.SetLineSpacing(0)
 	height, width := img.Bounds().Dx(), img.Bounds().Dy()
 	byt := []byte(fmt.Sprintf("\x1B*%c00", 33))
