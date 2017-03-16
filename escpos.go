@@ -3,6 +3,7 @@ package escpos
 import (
 	"encoding/base64"
 	"fmt"
+	"image"
 	"io"
 	"log"
 	"strconv"
@@ -112,6 +113,11 @@ func (e *Escpos) SetPrinterType(n int) {
 //设置行间距
 func (e *Escpos) SetLineSpacing(n int) {
 	e.Write(fmt.Sprintf("\x1B3%c", n))
+}
+
+//默认行间距
+func (e *Escpos) DefaultSpacing() {
+	e.Write("\x1B2")
 }
 
 //set location l+n*255
@@ -653,6 +659,30 @@ func (e *Escpos) WriteNode(name string, params map[string]string, data string) {
 }
 
 //print Qrcode
-func (e *Escpos) QrCode() {
-	e.Write(fmt.Sprintf("\x1BZ\x02%c%c\x00%chttp://www.baidu.com", 100, 1, 20))
+//使用33（24点双密度)
+func (e *Escpos) QrCode(img image.Image) {
+	e.SetLineSpacing(0)
+	height, width := img.Bounds().Dx(), img.Bounds().Dy()
+	byt := []byte(fmt.Sprintf("\x1B*%c00", 33))
+	byt[3] = byte(height % 256)
+	byt[4] = byte(height / 256)
+	data := []byte{0, 0, 0}
+	//循环高
+	for i := 0; i < (height/24 + 1); i++ {
+		e.b = append(e.b, byt...)
+		//循环宽
+		for j := 0; j < width; j++ {
+			for k := 0; k < 24; k++ {
+				if i*24+k < height {
+					r, _, _, _ := img.At(j, (i*24 + k)).RGBA()
+					if r == 0 {
+						data[k/8] += byte(128 >> uint(k%8))
+					}
+				}
+			}
+			e.b = append(e.b, data...)
+			data = []byte{0, 0, 0}
+		}
+		e.Linefeed(1)
+	}
 }
