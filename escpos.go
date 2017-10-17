@@ -662,7 +662,7 @@ func (e *Escpos) WriteNode(name string, params map[string]string, data string) {
 //使用33（24点双密度)
 func (e *Escpos) PrinterImage(img image.Image) {
 	e.SetLineSpacing(0)
-	height, width := img.Bounds().Dx(), img.Bounds().Dy()
+	width, height := img.Bounds().Dx(), img.Bounds().Dy()
 	byt := []byte(fmt.Sprintf("\x1B*%c00", 33))
 	byt[3] = byte(height % 256)
 	byt[4] = byte(height / 256)
@@ -675,7 +675,7 @@ func (e *Escpos) PrinterImage(img image.Image) {
 			for k := 0; k < 24; k++ {
 				if i*24+k < height {
 					r, g, b, _ := img.At(j, (i*24 + k)).RGBA()
-					if (r+g+b)/3 < 128 {
+					if (r+g+b)/3/255 < 128 {
 						data[k/8] += byte(128 >> uint(k%8))
 					}
 				}
