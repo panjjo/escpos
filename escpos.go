@@ -229,7 +229,13 @@ func (e *Escpos) Init() {
 	e.Write("\x1B@")
 	e.SendEmphasize()
 	e.SetPrinterType(0)
+	e.SetChineseOn()
 	e.SendRotate()
+}
+
+//开启中文打印
+func (e *Escpos) SetChineseOn() {
+	e.Write("\x1C&")
 }
 
 // end output
