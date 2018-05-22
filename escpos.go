@@ -691,4 +691,6 @@ func (e *Escpos) PrinterImage(img image.Image) {
 		}
 		e.Linefeed(1)
 	}
+	//设置为默认行高
+	e.Write(fmt.Sprintf("\x1B2"))
 }
