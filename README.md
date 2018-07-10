@@ -32,7 +32,7 @@ import (
     "bufio"
     "os"
 
-    "github.com/knq/escpos"
+    "github.com/panjjo/escpos"
 )
 
 func main() {
