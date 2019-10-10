@@ -87,6 +87,11 @@ func (e *Escpos) PrintPic() {
 	e.Write(fmt.Sprintf("\x1D/%c", 0))
 }
 
+//打开蜂鸣器
+func (e *Escpos) OpenBeep() {
+	e.Write(fmt.Sprintf("\x1b\x42\x09\x01"))
+}
+
 //开钱箱
 func (e *Escpos) OpenCashBox() {
 	e.Write(fmt.Sprintf("\x1Bp%c%c%c", 0, 2, 4))
